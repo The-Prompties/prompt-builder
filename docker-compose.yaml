@@ -1,0 +1,46 @@
+services:
+  node:
+    build: ./
+    working_dir: /app
+    entrypoint: node
+    volumes:
+      - .:/app
+
+  yarn:
+    build: ./
+    working_dir: /app
+    entrypoint: yarn
+    volumes:
+      - .:/app
+
+  npm:
+    build: ./
+    working_dir: /app
+    entrypoint: npm
+    volumes:
+      - .:/app
+
+  npx:
+    build: ./
+    working_dir: /app
+    entrypoint: npx
+    volumes:
+      - .:/app
+
+  next-app:
+    build: ./
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - "3003:3000"
+    volumes:
+      - .:/app
+
+  mariadb:
+    platform: linux/amd64
+    image: mariadb:10.5.8
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootpassword"
+    restart: "no"
