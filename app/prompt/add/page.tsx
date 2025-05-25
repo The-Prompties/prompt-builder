@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button, FormField } from '@/components';
 import { useRouter } from 'next/navigation';
 
-export default function OrderPage() {
+export default function AddPromptPage() {
     const [formData, setFormData] = useState({ theme: '', description: '', referenceFile: '' });
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);

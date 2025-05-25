@@ -12,8 +12,8 @@ export const Navbar: React.FC = () => {
                 <Logo />
             </div>
             <div className="flex items-center space-x-4">
-                <Link href="/order">
-                    <Button variant="secondary">Order</Button>
+                <Link href="/prompt/add">
+                    <Button variant="secondary">Add prompt</Button>
                 </Link>
                 {/* In a real app, show Login/Signup or Logout based on auth state */}
                 <Link href="/signin">

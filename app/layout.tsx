@@ -4,8 +4,8 @@ import { Navbar } from '@/components'; // Use alias if configured or relative pa
 import { Footer } from '@/components'; // Use alias
 
 export const metadata = {
-    title: 'Promptie',
-    description: 'Generate content on demand using AI',
+    title: 'Prompt Builder',
+    description: 'Your prompt database',
 };
 
 export default function RootLayout({
