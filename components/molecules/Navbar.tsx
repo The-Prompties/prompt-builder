@@ -14,18 +14,18 @@ export const Navbar: React.FC = () => {
         <nav className="bg-white shadow-md p-4 flex justify-between items-center">
             <div className="flex items-center space-x-4">
                 <Logo />
-                {isAuthenticated && (
-                    <Link href="/prompts">
-                        <Button variant="secondary">Prompts</Button>
-                    </Link>
-                )}
             </div>
             <div className="flex items-center space-x-4">
                 {isAuthenticated ? (
                     <>
-                        <span className="text-gray-700">
-                            Welcome, {(session?.user as any)?.login || 'User'}
-                        </span>
+                        <Link href="/user">
+                            <span className="text-gray-700 hover:text-blue-600 cursor-pointer">
+                                {(session?.user as any)?.login || 'User'}
+                            </span>
+                        </Link>
+                        <Link href="/prompt/add">
+                            <Button variant="secondary">Add Prompt</Button>
+                        </Link>
                         <Button 
                             variant="primary" 
                             onClick={() => signOut({ callbackUrl: '/' })}
