@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Button, FormField, Link } from '@/components';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function SignUpPage() {
     const [formData, setFormData] = useState({ login: '', password: '' });
@@ -44,13 +45,21 @@ export default function SignUpPage() {
                 } else {
                     throw new Error(errorData.error || 'Registration failed');
                 }
-            } else {
-                // Handle successful registration (e.g., show success message or auto-login/redirect)
-                // Redirect to user panel after successful registration
-                router.push('/user');
+                return;
             }
 
+            const result = await signIn('credentials', {
+                login: formData.login,
+                password: formData.password,
+                redirect: false,
+            });
 
+            if (result?.error) {
+                setError(result.error);
+            } else {
+                router.push('/prompts');
+                router.refresh();
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {

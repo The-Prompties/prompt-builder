@@ -10,20 +10,33 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  login     String   @unique // Use login/email as the unique identifier
-  password  String // Hashed password
+  login     String   @unique
+  password  String
   createdAt DateTime @default(now())
   orders    Order[]
+  prompts   Prompt[]
 }
 
 model Order {
   id            Int      @id @default(autoincrement())
   theme         String
   description   String
-  referenceFile String? // Optional file path or URL
+  referenceFile String? 
   createdAt     DateTime @default(now())
   user          User?    @relation(fields: [userId], references: [id])
-  userId        Int? // Nullable, if order can be placed by non-logged-in user
+  userId        Int?
 
-  @@index([userId]) // Indexing for faster lookups
+  @@index([userId])
+}
+
+model Prompt {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+
+  @@index([userId])
 }

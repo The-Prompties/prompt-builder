@@ -1,24 +1,48 @@
-// components/molecules/Navbar.tsx
+'use client';
+
 import * as React from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { Logo } from '../atoms/Logo';
 import { Button } from '../atoms/Button';
 import { Link } from '../atoms/Link';
 
-// This component might need state/context later to show Sign Out vs Login/Order
 export const Navbar: React.FC = () => {
+    const { data: session, status } = useSession();
+    const isAuthenticated = status === 'authenticated';
+
     return (
         <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-            <div>
+            <div className="flex items-center space-x-4">
                 <Logo />
+                {isAuthenticated && (
+                    <Link href="/prompts">
+                        <Button variant="secondary">Prompts</Button>
+                    </Link>
+                )}
             </div>
             <div className="flex items-center space-x-4">
-                <Link href="/prompt/add">
-                    <Button variant="secondary">Add prompt</Button>
-                </Link>
-                {/* In a real app, show Login/Signup or Logout based on auth state */}
-                <Link href="/signin">
-                    <Button variant="primary">Login</Button>
-                </Link>
+                {isAuthenticated ? (
+                    <>
+                        <span className="text-gray-700">
+                            Welcome, {(session?.user as any)?.login || 'User'}
+                        </span>
+                        <Button 
+                            variant="primary" 
+                            onClick={() => signOut({ callbackUrl: '/' })}
+                        >
+                            Sign Out
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Link href="/signin">
+                            <Button variant="primary">Login</Button>
+                        </Link>
+                        <Link href="/signup">
+                            <Button variant="secondary">Sign Up</Button>
+                        </Link>
+                    </>
+                )}
             </div>
         </nav>
     );

@@ -4,9 +4,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@/components';
 import { useRouter } from 'next/navigation';
-// import type { Order } from '@prisma/client'; // Import Prisma type
+import { Button } from '@/components/atoms/Button';
 
-// Define a type for the order data we expect from the API
 interface Order {
     id: number;
     theme: string;

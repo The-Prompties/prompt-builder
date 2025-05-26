@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Button, FormField, Link } from '@/components';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function SignInPage() {
     const [formData, setFormData] = useState({ login: '', password: '' });
@@ -13,7 +14,7 @@ export default function SignInPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        setError(null); // Clear error on input change
+        setError(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -22,26 +23,20 @@ export default function SignInPage() {
         setError(null);
 
         try {
-            const response = await fetch('/api/auth/signin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+            const result = await signIn('credentials', {
+                login: formData.login,
+                password: formData.password,
+                redirect: false,
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Login failed');
+            if (result?.error) {
+                setError(result.error);
+            } else {
+                router.push('/prompts');
+                router.refresh();
             }
-
-            // Handle successful login (e.g., store token/session info - SIMPLIFIED for demo)
-            // In a real app, you'd handle session cookies or tokens here.
-            // For this demo, we'll just redirect on success.
-            router.push('/user'); // Redirect to user panel
-
         } catch (err: any) {
-            setError(err.message);
+            setError(err.message || 'An error occurred during sign in');
         } finally {
             setLoading(false);
         }
@@ -72,7 +67,7 @@ export default function SignInPage() {
                     {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
                     <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? 'Signing in...' : 'Sign In'}
                     </Button>
                 </form>
 

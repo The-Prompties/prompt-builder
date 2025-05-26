@@ -1,7 +1,7 @@
-// app/layout.tsx
-import './global.css'; // Import Tailwind CSS
-import { Navbar } from '@/components'; // Use alias if configured or relative path
-import { Footer } from '@/components'; // Use alias
+import './global.css';
+import { Navbar } from '@/components';
+import { Footer } from '@/components';
+import { Providers } from './providers';
 
 export const metadata = {
     title: 'Prompt Builder',
@@ -16,11 +16,13 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8">
-            {children}
-        </main>
-        <Footer />
+            <Providers>
+                <Navbar />
+                <main className="flex-grow container mx-auto px-4 py-8">
+                    {children}
+                </main>
+                <Footer />
+            </Providers>
         </body>
         </html>
     );
