@@ -2,138 +2,147 @@
 "use client"; // Mark as Client Component
 
 import { useState } from 'react';
-import { Button, FormField } from '@/components';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components';
+
+interface CreatePromptFormProps {
+    onPromptCreated?: () => void;
+}
 
 export default function AddPromptPage() {
-    const [formData, setFormData] = useState({ theme: '', description: '', referenceFile: '' });
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [content, setContent] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const { data: session } = useSession();
     const router = useRouter();
-
-    const themes = ['generate logo', 'make visualization']; // Define allowed themes
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setError(null); // Clear error on input change
-        setSuccessMessage(null); // Clear success on input change
-    };
-
-    // Handle Select change (for theme) - Need a Select component or use plain select
-    const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFormData({ ...formData, theme: e.target.value });
-        setError(null);
-        setSuccessMessage(null);
-    };
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        if (!session) return;
+
+        setIsSubmitting(true);
         setError(null);
-        setSuccessMessage(null);
-
-        if (!formData.theme || !formData.description) {
-            setError('Theme and description are required.');
-            setLoading(false);
-            return;
-        }
-
-        if (!themes.includes(formData.theme)) {
-            setError('Invalid theme selected.');
-            setLoading(false);
-            return;
-        }
-
-
         try {
-            const response = await fetch('/api/orders', {
+            const response = await fetch('/api/prompts', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    title,
+                    description,
+                    content,
+                }),
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                setTitle('');
+                setDescription('');
+                setContent('');
+                router.push('/user/prompts');
+            } else {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create order');
+                setError(errorData.error || 'Failed to create prompt');
             }
-
-            // Optionally get the created order details
-            const createdOrder = await response.json();
-
-            setSuccessMessage('Order placed successfully!');
-            setFormData({ theme: '', description: '', referenceFile: '' }); // Clear form
-            // Optionally redirect to user panel or order details page
-            // router.push('/user');
-
-        } catch (err: any) {
-            setError(err.message);
+        } catch (error) {
+            console.error('Error creating prompt:', error);
+            setError('An error occurred while creating the prompt');
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
+    if (!session) {
+        return (
+            <div className="min-h-screen bg-gray-50 py-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                            Please sign in to create prompts
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex justify-center items-center min-h-[calc(100vh-200px)]"> {/* Adjust height */}
-            <div className="bg-white p-8 rounded shadow-md w-full max-w-lg">
-                <h2 className="text-2xl font-bold text-center mb-6">Place New Order</h2>
-                <form onSubmit={handleSubmit}>
-                    {/* Theme Select */}
-                    <div className="mb-4">
-                        <label htmlFor="theme" className="block text-sm font-medium text-gray-700 mb-1">
-                            Theme
-                        </label>
-                        <select
-                            id="theme"
-                            name="theme"
-                            value={formData.theme}
-                            onChange={handleThemeChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">Select a theme</option>
-                            {themes.map(theme => (
-                                <option key={theme} value={theme}>{theme}</option>
-                            ))}
-                        </select>
-                    </div>
+        <div className="min-h-screen bg-gray-50 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                        Create New Prompt
+                    </h2>
+                    <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                        Share your prompt with the community
+                    </p>
+                </div>
 
+                <div className="max-w-2xl mx-auto">
+                    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+                                {error}
+                            </div>
+                        )}
 
-                    {/* Description Textarea */}
-                    <div className="mb-4">
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                            Description
-                        </label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            rows={4}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        ></textarea>
-                    </div>
+                        <div>
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                                Title
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
 
+                        <div>
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                Description
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
 
-                    {/* Reference File (Simplified Input) */}
-                    <FormField
-                        label="Reference File (Optional URL/Path)"
-                        name="referenceFile"
-                        type="text" // Or type="file" with more complex handling
-                        value={formData.referenceFile}
-                        onChange={handleChange}
-                    />
+                        <div>
+                            <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+                                Content
+                            </label>
+                            <textarea
+                                id="content"
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                rows={6}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
 
-                    {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
-                    {successMessage && <p className="text-green-600 text-sm mb-4">{successMessage}</p>}
-
-
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? 'Placing Order...' : 'Place Order'}
-                    </Button>
-                </form>
+                        <div className="flex justify-end">
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                variant="primary"
+                            >
+                                {isSubmitting ? 'Creating...' : 'Create Prompt'}
+                            </Button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );
