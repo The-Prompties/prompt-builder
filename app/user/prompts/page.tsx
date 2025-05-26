@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Link } from '@/components';
+import { Button } from '@/components';
 
 interface Prompt {
     id: number;
@@ -54,12 +56,21 @@ export default function MyPromptsPage() {
                 <div className="grid gap-6">
                     {prompts.map((prompt) => (
                         <div key={prompt.id} className="bg-white rounded-lg shadow-md p-6">
-                            <h2 className="text-xl font-semibold text-blue-600 mb-2">
-                                {prompt.title}
-                            </h2>
-                            <p className="text-gray-600 mb-4">{prompt.description}</p>
-                            <div className="text-sm text-gray-500">
-                                Created: {new Date(prompt.createdAt).toLocaleDateString()}
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h2 className="text-xl font-semibold text-blue-600 mb-2">
+                                        {prompt.title}
+                                    </h2>
+                                    <p className="text-gray-600 mb-4">{prompt.description}</p>
+                                    <div className="text-sm text-gray-500">
+                                        Created: {new Date(prompt.createdAt).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <Link href={`/prompt/edit/${prompt.id}`}>
+                                    <Button variant="secondary" className="text-sm px-3 py-1">
+                                        Edit
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     ))}
