@@ -11,7 +11,9 @@ interface Prompt {
     description: string;
     user: {
         login: string;
+        id: string;
     };
+    createdAt: string;
 }
 
 export default function HomePage() {
@@ -65,20 +67,31 @@ export default function HomePage() {
                 ) : error ? (
                     <div className="text-center text-red-600">{error}</div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {prompts.map((prompt) => (
-                            <div key={prompt.id} className="bg-white p-4 rounded shadow-md hover:shadow-lg transition-shadow">
-                                <h3 className="text-xl font-semibold text-blue-600 mt-4">
-                                    {prompt.title}
-                                </h3>
-                                <p className="text-gray-700 mt-2 line-clamp-3">
-                                    {prompt.description}
-                                </p>
-                                <p className="text-sm text-gray-500 mt-2">
-                                    Author: {prompt.user.login}
-                                </p>
-                            </div>
-                        ))}
+                    <div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {prompts.map((prompt) => (
+                                <div key={prompt.id} className="bg-white p-4 rounded shadow-md hover:shadow-lg transition-shadow">
+                                    <Link href={`/prompt/${prompt.id}`}>
+                                    <h3 className="text-xl font-semibold text-blue-600 mt-4">
+                                        {prompt.title}
+                                    </h3>
+                                    </Link>
+                                    <p className="text-gray-700 mt-2 line-clamp-3">
+                                        {prompt.description}
+                                    </p>
+                                    <p className="text-sm text-gray-500 mt-2">
+                                        Author: {prompt.user.login}
+                                    </p>
+                                </div>
+                            ))}
+                                </div>
+                            <div className="mt-6 text-center">
+                        <Link href="/prompts">
+                            <Button variant="secondary">
+                                View All Prompts
+                            </Button>
+                        </Link>
+                    </div>
                     </div>
                 )}
                 {!loading && !error && prompts.length === 0 && (

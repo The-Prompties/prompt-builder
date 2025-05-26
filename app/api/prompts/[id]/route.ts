@@ -8,17 +8,17 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
         const prompt = await prisma.prompt.findUnique({
             where: {
-                id: parseInt(params.id),
-                userId: session.user.id
-            }
+                id: parseInt(params.id)
+            },
+            include: {
+                user: {
+                  select: {
+                    login: true
+                  }
+                }
+              }
         });
 
         if (!prompt) {

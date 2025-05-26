@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@/components';
 import { Button } from '@/components';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface Prompt {
     id: number;
@@ -10,18 +12,34 @@ interface Prompt {
     description: string;
     content: string;
     createdAt: string;
+    userId: string;
+    user: {
+        login: string;
+        id: string;
+    };
 }
 
 export default function MyPromptsPage() {
     const [prompts, setPrompts] = useState<Prompt[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { data: session } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
+        if (!session) {
+            router.push('/auth/signin');
+            return;
+        }
+
         const fetchPrompts = async () => {
             try {
-                const response = await fetch('/api/prompts');
+                const response = await fetch('/api/user/prompts');
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        router.push('/auth/signin');
+                        return;
+                    }
                     throw new Error('Failed to fetch prompts');
                 }
                 const data = await response.json();
@@ -35,7 +53,7 @@ export default function MyPromptsPage() {
         };
 
         fetchPrompts();
-    }, []);
+    }, [session, router]);
 
     if (loading) {
         return <div className="text-center">Loading...</div>;
