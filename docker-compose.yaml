@@ -36,6 +36,20 @@ services:
     volumes:
       - .:/app
 
+  next-app-prod:
+    build: ./
+    working_dir: /app
+    command: npm run prod
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "mysql://root:rootpassword@mariadb:3306/prompt_builder"
+      NEXTAUTH_URL: http://127.0.0.1:3003
+      NEXTAUTH_SECRET: aSuPerAnD0mStr1ng
+    ports:
+      - "80:3000"
+    volumes:
+      - .:/app
+
   mariadb:
     platform: linux/amd64
     image: mariadb:10.5.8

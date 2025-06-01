@@ -5,20 +5,21 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: number }> }
 ) {
+    const promptId = (await context.params).id;
     try {
         const prompt = await prisma.prompt.findUnique({
             where: {
-                id: parseInt(params.id)
+                id: promptId
             },
             include: {
                 user: {
-                  select: {
-                    login: true
-                  }
+                    select: {
+                        login: true
+                    }
                 }
-              }
+            }
         });
 
         if (!prompt) {
@@ -28,7 +29,7 @@ export async function GET(
         return NextResponse.json(prompt);
     } catch (error) {
         console.error('Error in GET /api/prompts/[id]:', error);
-        return NextResponse.json({ 
+        return NextResponse.json({
             error: 'Internal Server Error',
             details: error instanceof Error ? error.message : 'Unknown error'
         }, { status: 500 });
@@ -37,8 +38,9 @@ export async function GET(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: number }> }
 ) {
+    const promptId = (await context.params).id;
     try {
         const session = await getServerSession(authOptions);
 
@@ -54,7 +56,7 @@ export async function PUT(
 
         const prompt = await prisma.prompt.findUnique({
             where: {
-                id: parseInt(params.id),
+                id: promptId,
                 userId: session.user.id
             }
         });
@@ -65,7 +67,7 @@ export async function PUT(
 
         const updatedPrompt = await prisma.prompt.update({
             where: {
-                id: parseInt(params.id)
+                id: promptId
             },
             data: {
                 title,

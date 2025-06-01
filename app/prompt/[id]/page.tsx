@@ -80,14 +80,14 @@ export default function PromptDetailsPage({ params }: { params: Promise<{ id: st
                 <div className="bg-white rounded-lg shadow-md p-8">
                     <div className="flex justify-between items-start mb-6">
                         <h1 className="text-3xl font-bold text-gray-900">{prompt.title}</h1>
-                        {session?.user?.id === prompt.userId && (
-                            <Button
-                                variant="secondary"
-                                onClick={() => router.push(`/prompt/edit/${prompt.id}`)}
-                            >
-                                Edit Prompt
-                            </Button>
-                        )}
+                        {/*{session?.user?.id === prompt.userId.toString() && (*/}
+                        {/*    <Button*/}
+                        {/*        variant="secondary"*/}
+                        {/*        onClick={() => router.push(`/prompt/edit/${prompt.id}`)}*/}
+                        {/*    >*/}
+                        {/*        Edit Prompt*/}
+                        {/*    </Button>*/}
+                        {/*)}*/}
                     </div>
                     
                     <div className="mb-6">
